@@ -1,4 +1,10 @@
-#set document(title: "英译中神经机器翻译与可视化分析系统", author: "NMT Lab")
+#let title = "英译中神经机器翻译与可视化分析系统"
+#let short-title = "英汉神经机器翻译"
+#let author = "彭靖轩"
+#let project = "NMT Lab"
+#let id = "202400130242"
+#let date = datetime.today()
+#set document(title: title, author: author, date: date)
 #set page(
     width: 1120pt,
     height: 630pt,
@@ -8,7 +14,7 @@
         #set text(size: 18pt, fill: rgb("64748b"))
         #grid(
             columns: (1fr, auto),
-            [NMT Lab · 英汉神经机器翻译], [#context counter(page).display("1 / 1", both: true)],
+            [#project · #short-title], [#context counter(page).display("1 / 1", both: true)],
         )
     ],
 )
@@ -34,8 +40,6 @@
 #let label(body) = text(fill: teal, weight: "bold", body)
 
 #heading("01 / 课程问题", "英译中神经机器翻译与可视化分析系统")
-#text(size: 27pt, fill: muted)[从循环状态到注意力：固定模型，比较解码策略]
-#v(30pt)
 #grid(
     columns: (1fr, 1fr, 1fr),
     gutter: 32pt,
@@ -58,9 +62,7 @@
 #v(34pt)
 #text(size: 26pt, weight: "bold")[问题：扩大搜索宽度，能否稳定改善翻译？代价多大？]
 #v(16pt)
-课程联系：序列建模、长程依赖、条件概率与搜索。采用 Transformer，而非 LSTM 的改型。
-#v(20pt)
-#text(size: 18pt, fill: muted)[算法依据：#cite(<transformer>, style: "apa").]
+课程联系：序列建模、长程依赖、条件概率与搜索。采用 Transformer。#cite(<transformer>, style: "gb-7714-2015-numeric")
 
 #pagebreak()
 #heading("02 / 系统实现", "一套可操作、可复现的本地实验系统")
@@ -68,14 +70,14 @@
     columns: (1.45fr, 1fr),
     gutter: 30pt,
     [
-        #image("../results/figures/compare.png", width: 100%, height: 275pt, fit: "contain")
+        #image("../results/figures/compare.png", width: 100%, height: 300pt, fit: "contain")
         #v(8pt)
         #text(size: 18pt, fill: muted)[同一输入并列比较 Greedy 与 Beam $= #beam.num_beams$。]
     ],
     [
         #label[复用成熟能力]
         #v(8pt)
-        MADLAD-400 3B 预训练权重 #cite(<madlad>, style: "apa")、Transformers 推理、Gradio 界面组件。
+        MADLAD-400 3B 预训练权重 #cite(<madlad>, style: "gb-7714-2015-numeric")、Transformers 推理、Gradio 界面组件。
         #v(12pt)
         #label[本项目实现]
         #v(8pt)
@@ -129,14 +131,14 @@
 #text(
     size: 18pt,
     fill: muted,
-)[无采样；生成上限 $256$ token；length penalty $= 1$；early stopping=false。BLEU：zh；chrF：$beta = 2$。#cite(<sacrebleu>, style: "apa")；#cite(<madlad>, style: "apa").]
+)[无采样；生成上限 $256$ token；length penalty $= 1$；early stopping=false。BLEU：zh；chrF：$beta = 2$。#cite(<sacrebleu>, style: "gb-7714-2015-numeric")#cite(<madlad>, style: "gb-7714-2015-numeric").]
 
 #pagebreak()
 #heading("04 / 注意力观察", "Cross-attention：观察生成时的信息分配")
 #grid(
     columns: (1.5fr, 1fr),
     [
-        #image("../results/figures/attention.svg", height: 350pt, fit: "contain")
+        #image("../results/figures/attention.svg", height: 400pt, fit: "contain")
         #text(
             size: 18pt,
             fill: muted,
@@ -175,9 +177,7 @@
     fill: teal,
 )[该句 chrF：#number(example.greedy.chrf) $arrow.r$ #number(example.beam.chrf)。搜索宽度增加不保证每句改善。]
 #v(10pt)
-#text(
-    size: 20pt,
-)[Beam 把“核心”改为“重点”，句级 chrF 下降；两种译文都未解决 makes people tick 的习语误译。负向极值体现逐句差异，并不代表整体质量变化。]
+#text(size: 20pt)[Beam 把“核心”改为“重点”，句级 chrF 下降；两种译文都未解决 makes people tick 的习语误译。]
 
 #pagebreak()
-#bibliography("../report/references.bib", style: "apa")
+#bibliography("../report/references.bib", style: "gb-7714-2015-numeric")

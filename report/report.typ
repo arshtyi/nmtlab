@@ -1,3 +1,7 @@
+#let title = "英译中神经机器翻译与可视化分析系统"
+#let author = "彭靖轩"
+#let id = "202400130242"
+#let date = datetime.today()
 #let summary = json("../results/summary.json")
 #let cases = json("../results/cases.json")
 #let attention = json("../results/figures/attention.json")
@@ -34,19 +38,19 @@
     #v(4pt)
     #body
 ]
-#set document(title: "英译中神经机器翻译与可视化分析系统", author: "彭靖轩")
+#set document(title: title, author: author, date: date)
 #set page(
     paper: "a4",
     margin: (top: 20mm, bottom: 18mm, left: 20mm, right: 20mm),
     header: context [
         #set text(font: ("Lato", "Noto Sans CJK SC"), size: 8pt, fill: muted)
-        NMT LAB #h(1fr) 神经机器翻译课程实践
+        NMT LAB #h(1fr) 神经机器翻译
         #v(3pt)
         #line(length: 100%, stroke: 0.4pt + rgb("cbd6d8"))
     ],
     footer: context [
         #set text(font: ("Lato", "Noto Sans CJK SC"), size: 8pt, fill: muted)
-        固定模型 · 固定样本 · 可追溯结果 #h(1fr) #counter(page).display("1")
+        #align(right, counter(page).display("1"))
     ],
 )
 #set text(font: ("Lato", "Noto Serif CJK SC"), size: 10.5pt, fill: ink, lang: "zh")
@@ -58,12 +62,13 @@
 #set table(inset: (x: 6pt, y: 6pt), stroke: 0.4pt + rgb("d1dcde"), fill: (x, y) => if y == 0 { pale } else { none })
 #show table.cell.where(y: 0): set text(weight: "bold", font: ("Lato", "Noto Sans CJK SC"))
 
-#text(font: ("Lato", "Noto Sans CJK SC"), weight: "bold", size: 24pt)[英译中神经机器翻译与可视化分析系统]
-#v(5pt)
-#text(font: ("Lato", "Noto Sans CJK SC"), size: 15pt, fill: muted)[解码比较、可复现实验与交叉注意力观察]
-#parbreak()
-#text(font: ("Lato", "Noto Sans CJK SC"), size: 10pt, fill: muted)[彭靖轩 · 202400130242 · 24智能]
-#v(15pt)
+#text(font: ("Lato", "Noto Sans CJK SC"), weight: "bold", size: 24pt, title)
+#v(0pt)
+#text(
+    font: ("Lato", "Noto Sans CJK SC"),
+    size: 10pt,
+    fill: muted,
+)[#author · #id · #date.display("[year]-[month]-[day]")]
 
 = 研究背景与任务定位
 
@@ -220,8 +225,7 @@ BLEU 使用中文 tokenizer、大小写敏感、指数平滑且关闭 effective 
 
 #for (index, case) in cases.enumerate() {
     if index == 2 {
-        pagebreak()
-        text(font: ("Lato", "Noto Sans CJK SC"), size: 18pt, weight: "bold")[案例续：搜索变化与参考匹配]
+        text(font: ("Lato", "Noto Sans CJK SC"), size: 14pt, weight: "bold")[案例续：搜索变化与参考匹配]
         parbreak()
         [以下两例由带符号的句级 chrF 差值极值确定。正向变化不自动意味着同等幅度的语义改善；负向变化也应定位到具体信息与表达。]
         parbreak()
@@ -278,7 +282,4 @@ BLEU 使用中文 tokenizer、大小写敏感、指数平滑且关闭 effective 
 横轴为源端子词，纵轴为预测目标子词。独立边界 token 吸收了较多权重，不能将其视为源词。左图按可见最大值调整色阶以显示词汇区域，数值未重归一化；跨层、跨头比较应读取色标数值。多头均值与局部高权重均不能视为严格词对齐或因果解释。
 
 #pagebreak()
-
-#show bibliography: set text(size: 9pt)
-#show bibliography: set par(justify: false)
-#bibliography("references.bib", title: [参考文献], style: "gb-7714-2015-numeric")
+#bibliography("references.bib", style: "gb-7714-2015-numeric")
