@@ -1,3 +1,7 @@
+#let title = "英译中神经机器翻译与可视化分析系统"
+#let author = "彭靖轩"
+#let id = "202400130242"
+#let date = datetime.today()
 #let summary = json("../results/summary.json")
 #let cases = json("../results/cases.json")
 #let attention = json("../results/figures/attention.json")
@@ -23,10 +27,10 @@
 #let note(body) = block(width: 100%, fill: pale, inset: 10pt, radius: 3pt, body)
 #let idline(title, value) = block(width: 100%, above: 7pt, below: 7pt)[
     #grid(
-        columns: (1fr,),
+        columns: (1fr, auto),
+        align: (left, right),
         row-gutter: 3pt,
-        text(weight: "bold", title),
-        text(font: "Lato", size: 8.5pt, value),
+        text(weight: "bold", title), text(font: "Lato", size: 8.5pt, value),
     )
 ]
 #let panel(title, body) = block(width: 100%, stroke: 0.5pt + rgb("c6d5d7"), inset: 11pt, radius: 3pt)[
@@ -34,36 +38,52 @@
     #v(4pt)
     #body
 ]
-#set document(title: "英译中神经机器翻译与可视化分析系统", author: "彭靖轩")
+#set document(title: title, author: author, date: date)
 #set page(
     paper: "a4",
     margin: (top: 20mm, bottom: 18mm, left: 20mm, right: 20mm),
     header: context [
-        #set text(font: ("Lato", "Noto Sans CJK SC"), size: 8pt, fill: muted)
-        NMT LAB #h(1fr) 神经机器翻译课程实践
-        #v(3pt)
+        #set text(font: ((name: "Lato", covers: "latin-in-cjk"), "Noto Sans CJK SC"), size: 8pt, fill: muted)
+        NMT LAB #h(1fr) 神经机器翻译
         #line(length: 100%, stroke: 0.4pt + rgb("cbd6d8"))
     ],
     footer: context [
-        #set text(font: ("Lato", "Noto Sans CJK SC"), size: 8pt, fill: muted)
-        固定模型 · 固定样本 · 可追溯结果 #h(1fr) #counter(page).display("1")
+        #set text(font: ((name: "Lato", covers: "latin-in-cjk"), "Noto Sans CJK SC"), size: 8pt, fill: muted)
+        #align(right, counter(page).display("1"))
     ],
 )
-#set text(font: ("Lato", "Noto Serif CJK SC"), size: 10.5pt, fill: ink, lang: "zh")
+#set text(
+    font: ((name: "Lato", covers: "latin-in-cjk"), "Noto Serif CJK SC"),
+    size: 11pt,
+    fill: ink,
+    lang: "zh",
+    region: "cn",
+)
 #set par(justify: true, leading: 0.62em, spacing: 0.8em)
-#set heading(numbering: "1.1")
-#show heading: set text(font: ("Lato", "Noto Sans CJK SC"), fill: ink)
+#set heading(numbering: "1.1.")
+#show heading: set text(font: ((name: "Lato", covers: "latin-in-cjk"), "Noto Sans CJK SC"), fill: ink)
 #show heading.where(level: 1): set text(size: 18pt)
 #show heading.where(level: 2): set text(size: 12pt)
 #set table(inset: (x: 6pt, y: 6pt), stroke: 0.4pt + rgb("d1dcde"), fill: (x, y) => if y == 0 { pale } else { none })
-#show table.cell.where(y: 0): set text(weight: "bold", font: ("Lato", "Noto Sans CJK SC"))
+#show table.cell.where(y: 0): set text(weight: "bold", font: (
+    (name: "Lato", covers: "latin-in-cjk"),
+    "Noto Sans CJK SC",
+))
+#show raw: set text(font: "JetBrains Mono")
+#show raw.where(block: false): box.with(
+    fill: luma(240),
+    inset: (x: .3em, y: 0em),
+    outset: (x: 0em, y: .3em),
+    radius: .2em,
+)
 
-#text(font: ("Lato", "Noto Sans CJK SC"), weight: "bold", size: 24pt)[英译中神经机器翻译与可视化分析系统]
-#v(5pt)
-#text(font: ("Lato", "Noto Sans CJK SC"), size: 15pt, fill: muted)[解码比较、可复现实验与交叉注意力观察]
-#parbreak()
-#text(font: ("Lato", "Noto Sans CJK SC"), size: 10pt, fill: muted)[彭靖轩 · 202400130242 · 24智能]
-#v(15pt)
+#text(font: ((name: "Lato", covers: "latin-in-cjk"), "Noto Serif CJK SC"), weight: "bold", size: 24pt, title)
+#v(0pt)
+#text(
+    font: ((name: "Lato", covers: "latin-in-cjk"), "Noto Sans CJK SC"),
+    size: 10pt,
+    fill: muted,
+)[#author · #id · #date.display("[year]-[month]-[day]")]
 
 = 研究背景与任务定位
 
@@ -105,7 +125,7 @@ $ hat(y)_t = arg max_v P(v | hat(y)_(<t), x). $
 $ s(y) = (sum_(t=1)^T log P(y_t | y_(<t), x)) / T^alpha, quad alpha = 1. $
 这里 $T$ 表示库用于长度归一化的生成长度，EOS 处理及停止细节由已保存的生成配置和依赖版本共同确定。束搜索仍是近似搜索；更高的模型分数不等于更忠实或更高的参考匹配分数。
 
-两种模式都关闭采样，最多生成 $256$ 个新 token。束搜索的 `early_stopping=false` 使用启发式停止判据，并不要求每句生成到上限，也不是穷举全体可能序列。Beam 维护多个候选，增加计算和内存开销。
+两种模式都关闭采样，最多生成 $256$ 个新 token。束搜索的 ```python early_stopping=false``` 使用启发式停止判据，并不要求每句生成到上限，也不是穷举全体可能序列。Beam 维护多个候选，增加计算和内存开销。
 
 == 指标观察的含义
 
@@ -127,7 +147,7 @@ BLEU 主要衡量候选与参考的 $n$-gram 匹配，并含长度惩罚；本�
 $ A^((l,h)) = op("softmax")_("source")(Q^((l,h)) (K^((l,h)))^top), quad Z^((l,h)) = A^((l,h)) V^((l,h)). $
 T5 不显式除以 $sqrt(d_k)$，此处也没有学习的相对位置偏置；源端填充位置由掩码排除。项目直接读取模型重放输出的权重。矩阵 $A$ 的行是预测目标位置，列是源 token 位置；保留全部源位置时，每行权重和约为 $1$。保存张量顺序为“层 $times$ 头 $times$ 目标长度 $times$ 源长度”，界面层与头采用一基编号，头编号 $0$ 表示所有头的算术平均。
 
-设生成结果为 $[y_0, y_1, dots, y_T]$，其中 $y_0$ 为 decoder start。重放时输入 `output_ids[:-1]`，即 $[y_0, dots, y_(T-1)]$；第 $t-1$ 行表示在前缀条件下预测 $y_t$ 时的交叉注意力，故标签使用 `output_ids[1:]`。若把行标签错写为 decoder 输入，会产生一位偏移。重放实际选中的完整生成序列，不混用束搜索中已淘汰候选的权重。
+设生成结果为 $[y_0, y_1, dots, y_T]$，其中 $y_0$ 为 decoder start。重放时输入 ```python output_ids[:-1]```，即 $[y_0, dots, y_(T-1)]$；第 $t-1$ 行表示在前缀条件下预测 $y_t$ 时的交叉注意力，故标签使用 ```python output_ids[1:]```。若把行标签错写为 decoder 输入，会产生一位偏移。重放实际选中的完整生成序列，不混用束搜索中已淘汰候选的权重。
 
 保留 SentencePiece 原始子词和位置。默认隐藏语言控制符、EOS、PAD 及独立的 `▁` 边界 token，保留 `▁word` 形式的词首标记与未知 token。隐藏行列后不重新归一化；色阶范围为 $0$ 到可见最大权重，右侧 Hidden mass 单独显示每行被隐藏源位置的权重之和。完整视图可恢复所有 token。bfloat16 权重含舍入误差，绘图时仅转换为 float32。
 
@@ -145,9 +165,9 @@ T5 不显式除以 $sqrt(d_k)$，此处也没有学习的相对位置偏置；�
 
 == 数据、模型与环境固定
 
-FLORES-200 @nllb @flores 的英文 `eng_Latn` 与简体中文 `zho_Hans` devtest 各含 $1012$ 行。用 Python `random.Random(42)` 从一基行号 $1 <= i <= 1012$ 无放回抽取 $200$ 个 ID，再排序写入清单；加载时重新校验抽样规则、双语对齐、行数和字节哈希。
+FLORES-200 @nllb @flores 的英文 `eng_Latn` 与简体中文 `zho_Hans` devtest 各含 $1012$ 行。用 Python ```python random.Random(42)``` 从一基行号 $1 <= i <= 1012$ 无放回抽取 $200$ 个 ID，再排序写入清单；加载时重新校验抽样规则、双语对齐、行数和字节哈希。
 
-准备阶段先核对整个压缩包 SHA-256，再读取指定的两个 devtest 普通文件并校验各自哈希，避免不受控解包。模型固定到 commit；推理通过 `local_files_only=True` 加载 tokenizer、模型与生成配置，缓存缺失时明确失败。
+准备阶段先核对整个压缩包 SHA-256，再读取指定的两个 devtest 普通文件并校验各自哈希，避免不受控解包。模型固定到 commit；推理通过 ```python local_files_only=True``` 加载 tokenizer、模型与生成配置，缓存缺失时明确失败。
 
 #idline("模型", cfg.model.id)
 #idline("模型 revision", cfg.model.revision)
@@ -220,8 +240,7 @@ BLEU 使用中文 tokenizer、大小写敏感、指数平滑且关闭 effective 
 
 #for (index, case) in cases.enumerate() {
     if index == 2 {
-        pagebreak()
-        text(font: ("Lato", "Noto Sans CJK SC"), size: 18pt, weight: "bold")[案例续：搜索变化与参考匹配]
+        text(font: ("Lato", "Noto Sans CJK SC"), size: 14pt, weight: "bold")[案例续：搜索变化与参考匹配]
         parbreak()
         [以下两例由带符号的句级 chrF 差值极值确定。正向变化不自动意味着同等幅度的语义改善；负向变化也应定位到具体信息与表达。]
         parbreak()
@@ -278,7 +297,4 @@ BLEU 使用中文 tokenizer、大小写敏感、指数平滑且关闭 effective 
 横轴为源端子词，纵轴为预测目标子词。独立边界 token 吸收了较多权重，不能将其视为源词。左图按可见最大值调整色阶以显示词汇区域，数值未重归一化；跨层、跨头比较应读取色标数值。多头均值与局部高权重均不能视为严格词对齐或因果解释。
 
 #pagebreak()
-
-#show bibliography: set text(size: 9pt)
-#show bibliography: set par(justify: false)
-#bibliography("references.bib", title: [参考文献], style: "gb-7714-2015-numeric")
+#bibliography("references.bib", style: "gb-7714-2015-numeric")
