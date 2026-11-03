@@ -57,6 +57,6 @@ Outputs are saved under `results/`:
 
 Attention is recomputed on the exact generated sequence after translation timing ends. Decoder inputs use the sequence without its final token; row labels use the sequence without the decoder-start token. This keeps each row associated with the token being predicted, including for the selected beam-search output.
 
-Raw SentencePiece subwords are retained. Hiding control tokens does not renormalize the remaining weights; the mean-head view averages heads within one layer. The plot remains tied to its captured input until a new snapshot is generated.
+Raw SentencePiece subwords are retained. The default view hides control tokens and standalone `▁` boundary tokens, but keeps word-initial markers such as `▁word` and unknown tokens. Colors scale from zero to the largest visible weight; the colorbar reports the original values. A separate Hidden mass bar shows the total weight of omitted source positions for each displayed target token. No weights are renormalized. Enable "Show control and boundary tokens" for the complete matrix. The plot remains tied to its captured input until a new snapshot is generated.
 
 Cross-attention is an internal model signal, not strict word alignment or a causal explanation.
