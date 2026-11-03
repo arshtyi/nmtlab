@@ -23,7 +23,15 @@ def main() -> None:
         "source_special": attention.source_special,
         "target_special": attention.target_special,
         "weights": attention.weights.tolist(),
-        "view": {"layer": layer, "head": "mean", "show_special": False, "renormalized": False},
+        "view": {
+            "layer": layer,
+            "head": "mean",
+            "show_special": False,
+            "hide_standalone_boundary": True,
+            "color_scale": "visible_maximum",
+            "hidden_source_mass": "sum of omitted source positions per visible target row",
+            "renormalized": False,
+        },
     }
     (output / "attention.json").write_text(json.dumps(record, ensure_ascii=False, indent=4) + "\n")
     print(f"Attention figure and underlying weights saved to {output}.")

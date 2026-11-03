@@ -214,11 +214,11 @@ def create_app(translator: Translator) -> gr.Blocks:
                     label="Attention head",
                     filterable=False,
                 )
-                show_special = gr.Checkbox(value=False, label="Show special tokens")
+                show_special = gr.Checkbox(value=False, label="Show control and boundary tokens")
             attention_plot = gr.Plot(label="Decoder cross-attention", show_label=False, format="png")
             gr.Markdown(
-                "Cross-attention replay on generated tokens; rows: target, columns: source. Raw subwords are preserved; "
-                "hidden special tokens are not renormalized. Attention is not alignment or a causal explanation."
+                "Rows: predicted target subwords; columns: source subwords. Colors scale to the visible maximum; weights are not renormalized. "
+                "Hidden mass totals omitted control and standalone boundary tokens. Attention is not alignment or a causal explanation."
             )
             attention_button.click(
                 capture_attention,

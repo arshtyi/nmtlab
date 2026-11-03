@@ -129,7 +129,7 @@ T5 不显式除以 $sqrt(d_k)$，此处也没有学习的相对位置偏置；�
 
 设生成结果为 $[y_0, y_1, dots, y_T]$，其中 $y_0$ 为 decoder start。重放时输入 `output_ids[:-1]`，即 $[y_0, dots, y_(T-1)]$；第 $t-1$ 行表示在前缀条件下预测 $y_t$ 时的交叉注意力，故标签使用 `output_ids[1:]`。若把行标签错写为 decoder 输入，会产生一位偏移。重放实际选中的完整生成序列，不混用束搜索中已淘汰候选的权重。
 
-保留 SentencePiece 原始子词边界和位置，不把多个子词合并成看似整词的对齐。语言控制符、EOS 与 PAD 可在显示时隐藏；未知 token 仍保留。语言控制符用于指定翻译方向，其权重不能解释为词汇对齐。bfloat16 权重含舍入误差；绘图时转换为 float32，隐藏行列后不重新归一化，所以可见行的权重总和可以小于 $1$。
+保留 SentencePiece 原始子词和位置。默认隐藏语言控制符、EOS、PAD 及独立的 `▁` 边界 token，保留 `▁word` 形式的词首标记与未知 token。隐藏行列后不重新归一化；色阶范围为 $0$ 到可见最大权重，右侧 Hidden mass 单独显示每行被隐藏源位置的权重之和。完整视图可恢复所有 token。bfloat16 权重含舍入误差，绘图时仅转换为 float32。
 
 == 输入与输出的保护范围
 
@@ -268,14 +268,14 @@ BLEU 使用中文 tokenizer、大小写敏感、指数平滑且关闭 effective 
 )
 #figure(
     image("../results/figures/attention.svg", fit: "contain"),
-    caption: [实际生成序列重放的交叉注意力：第 $#attention.view.layer$ 层、全部头算术平均；隐藏特殊 token，不重新归一化。],
+    caption: [第 $#attention.view.layer$ 层、全部头算术均值；左图保留词汇子词的原始权重，右侧显示隐藏位置的权重总量。],
 )
 
 *图中源句：* #attention.translation.source
 #parbreak()
 *实际译文：* #attention.translation.text
 #parbreak()
-横轴为源端原始子词，纵轴为预测目标子词。源端的目标语言控制符已隐藏；平均多个头会掩盖头间差异，且开头的词边界 token 可能形成明显权重集中。
+横轴为源端子词，纵轴为预测目标子词。独立边界 token 吸收了较多权重，不能将其视为源词。左图按可见最大值调整色阶以显示词汇区域，数值未重归一化；跨层、跨头比较应读取色标数值。多头均值与局部高权重均不能视为严格词对齐或因果解释。
 
 #pagebreak()
 
